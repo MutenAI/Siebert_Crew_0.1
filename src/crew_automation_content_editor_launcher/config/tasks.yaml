@@ -1,0 +1,63 @@
+---
+initialization_task:
+  description: Access the CSV file located at {brand_info_csv} using CSVSearchTool
+    to retrieve and format values for {brand_name}, {tone_of_voice}, {primary_target},
+    {secondary_target}, {unique_selling_points}, {brand_colors}, {keywords}, and {avoid_terms}.
+    Define the overall content objectives based on the initial {content_request}.
+  expected_output: A structured report detailing the brand information extracted from
+    the CSV, establishing context for the entire content creation process.
+  async_execution: false
+  agent: leader
+brief_dispatch_task:
+  description: Dispatch the brief to all involved stakeholders, including {content_request}
+    details and mapped CSV data (from {brand_info_csv} and {best_practices_csv}) so
+    that the research and content creation stages have clear input parameters.
+  expected_output: A comprehensive brief that clearly outlines the objectives and
+    includes essential CSV-based context for further processing.
+  async_execution: false
+  agent: leader
+web_research_task:
+  description: Leverage WebsiteSearchTool to perform online research based on keywords
+    and brand parameters from {brand_name} and {keywords}. Gather relevant information
+    and market insights that complement the CSV data.
+  expected_output: A detailed research report containing online findings and trends
+    relevant to {brand_name} and its market.
+  async_execution: false
+  agent: web_searcher
+  context:
+  - brief_dispatch_task
+content_creation_task:
+  description: Utilize CSV data from {brand_info_csv} and {best_practices_csv} along
+    with the research report to craft the initial draft of the content. Ensure that
+    the narrative aligns with {tone_of_voice} and leverages guidelines such as {structure},
+    {ideal_length}, and {required_elements}.
+  expected_output: An initial draft content that meets brand guidelines and best practices,
+    ready for revision.
+  async_execution: false
+  agent: copywriter
+  context:
+  - initialization_task
+  - web_research_task
+revision_task:
+  description: Review the initial content draft (from content_creation_task) by cross-referencing
+    CSV data from {compliance_info_csv} to check for mandatory compliance elements
+    ({mandatory_elements}), absence of forbidden elements ({forbidden_elements}),
+    and inclusion of necessary disclaimers ({disclaimers}). Optimize the content for
+    SEO and overall performance.
+  expected_output: An optimized content draft enhanced for SEO and compliance, with
+    revision recommendations embedded.
+  async_execution: false
+  agent: editor
+  context:
+  - content_creation_task
+finalization_task:
+  description: Evaluate the revised content draft from revision_task. Approve the
+    final version if it meets all quality, compliance, and SEO criteria, or provide
+    additional feedback for further modification. Finalize the content for distribution
+    under the brand {brand_name}.
+  expected_output: Final approved content that is optimized, compliant, and ready
+    for distribution.
+  async_execution: false
+  agent: leader
+  context:
+  - revision_task
