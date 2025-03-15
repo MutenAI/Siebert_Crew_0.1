@@ -33,3 +33,6 @@ Thumbs.db
 
 # Jupyter Notebook
 .ipynb_checkpoints
+
+# UV lock file
+uv.lock

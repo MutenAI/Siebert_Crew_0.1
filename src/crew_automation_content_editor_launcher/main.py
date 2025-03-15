@@ -21,7 +21,7 @@ def run():
         'content_request': content_request,
         'brand_info_csv': os.path.join(os.getcwd(), 'RAG', 'Rag 1', 'brand_info.csv'),
         'best_practices_csv': os.path.join(os.getcwd(), 'RAG', 'Rag 2', 'best_practices.csv'),
-        'compliance_info_csv': os.path.join(os.getcwd(), 'RAG', 'Rag 3', 'compliance_info.csv - Foglio1.csv'),
+        'compliance_info_csv': os.path.join(os.getcwd(), 'RAG', 'Rag 3', 'compliance_info.csv'),
         'secondary_target': 'Financial advisors and wealth management professionals',
         'unique_selling_points': 'Over 50 years of experience, personalized service, competitive fees',
         'brand_colors': 'Blue and white',
