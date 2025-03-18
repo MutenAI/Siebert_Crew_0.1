@@ -107,6 +107,17 @@ class ContentEditorLogger:
         if details:
             message += f" | DETAILS: {details}"
         self.log_info(message)
+    
+    def log_llm_process(self, agent_name, llm_thought, decision_reasoning, tool_usage_details):
+        """Log LLM's internal reasoning process and tool interactions"""
+        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
+        message = (
+            f"{timestamp} | LLM PROCESS: {agent_name} | "
+            f"THOUGHT: {llm_thought} | "
+            f"REASONING: {decision_reasoning} | "
+            f"TOOLS: {tool_usage_details}"
+        )
+        self.log_info(message)
 
 # Create a singleton instance
 logger = ContentEditorLogger()

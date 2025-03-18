@@ -89,3 +89,33 @@ class CrewAutomationContentEditorLauncherCrew():
             process=Process.sequential,
             verbose=True,
         )
+
+# Web Searcher Agent
+web_searcher = Agent(
+    role='Trending Content Researcher',
+    goal='Find engaging, viral content patterns from social/digital platforms',
+    backstory="""Expert in identifying emerging trends and high-engagement content
+    formats across platforms like TikTok, Instagram, and YouTube.""",
+    tools=[WebSearchTool()],
+    verbose=True
+)
+
+# Copywriter Agent
+copywriter = Agent(
+    role='Creative Content Architect',
+    goal='Craft compelling narratives using storytelling techniques',
+    backstory="""Specialist in transforming information into engaging stories
+    through humor, analogies, and interactive elements.""",
+    tools=[CSVSearchTool()],
+    verbose=True
+)
+
+# Editor Agent
+editor = Agent(
+    role='Engagement Optimizer',
+    goal='Enhance content appeal without compromising message clarity',
+    backstory="""Expert in refining content flow, adding visual storytelling
+    elements, and ensuring audience connection.""",
+    tools=[CSVSearchTool()],
+    verbose=True
+)

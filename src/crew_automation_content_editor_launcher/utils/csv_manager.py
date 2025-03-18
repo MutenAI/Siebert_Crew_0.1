@@ -71,13 +71,13 @@ class CSVManager:
                 ["Tone of Voice", ""]
             ]
         elif csv_name == "best_practices":
-            headers = ["", ""]
+            headers = ["Content Type", "Engagement Guidelines"]
             data = [
-                ["tipocontenuto", ""],
-                ["struttura", ""],
-                ["lunghezzaideale", ""],
-                ["elementinecessari", ""],
-                ["tonoconsigliato", ""]
+                ["Social Media Post", "Use emojis and hashtags strategically"],
+                ["Blog Article", "Incorporate storytelling elements"],
+                ["Video Script", "Include call-to-action within first 15 seconds"],
+                ["Newsletter", "Personalize subject lines with reader's name"],
+                ["Infographic", "Use bold visuals with minimal text"]
             ]
         elif csv_name == "compliance_info":
             headers = ["", ""]
@@ -95,79 +95,25 @@ class CSVManager:
         logger.log_info(f"Created empty {csv_name} CSV file at {csv_path}")
     
     def load_brand_info(self) -> Dict[str, str]:
-        """
-        Load and parse the brand_info CSV file.
-        
-        Returns:
-            A dictionary containing the brand information
-        """
-        logger.log_data_access("CSVManager", self.rag1_path, "read", "Loading brand info")
-        try:
-            df = pd.read_csv(self.rag1_path)
-            # Convert the DataFrame to a dictionary
-            brand_info = {}
-            for _, row in df.iterrows():
-                if len(row) >= 2:  # Ensure there are at least two columns
-                    key = row[0]
-                    value = row[1]
-                    if pd.notna(key) and pd.notna(value):  # Skip NaN values
-                        brand_info[key] = value
-            
-            logger.log_info(f"Successfully loaded brand info with {len(brand_info)} entries")
-            return brand_info
-        except Exception as e:
-            logger.log_error(f"Error loading brand info: {str(e)}")
-            return {}
-    
+        df = pd.read_csv(self.rag1_path)
+        brand_info = df.set_index('Area')['Key Info'].to_dict()
+        logger.log_data_access("CSVManager", self.rag1_path, "read", 
+                              f"Query: brand_info search | Results: {len(brand_info)} entries")
+        return brand_info
+
     def load_best_practices(self) -> Dict[str, str]:
-        """
-        Load and parse the best_practices CSV file.
-        
-        Returns:
-            A dictionary containing the best practices
-        """
-        logger.log_data_access("CSVManager", self.rag2_path, "read", "Loading best practices")
-        try:
-            df = pd.read_csv(self.rag2_path)
-            # Convert the DataFrame to a dictionary
-            best_practices = {}
-            for _, row in df.iterrows():
-                if len(row) >= 2:  # Ensure there are at least two columns
-                    key = row[0]
-                    value = row[1]
-                    if pd.notna(key) and pd.notna(value):  # Skip NaN values
-                        best_practices[key] = value
-            
-            logger.log_info(f"Successfully loaded best practices with {len(best_practices)} entries")
-            return best_practices
-        except Exception as e:
-            logger.log_error(f"Error loading best practices: {str(e)}")
-            return {}
-    
+        df = pd.read_csv(self.rag2_path)
+        best_practices = df.set_index('Content Type')['Engagement Guidelines'].to_dict()
+        logger.log_data_access("CSVManager", self.rag2_path, "read", 
+                              f"Query: best_practices search | Results: {len(best_practices)} entries")
+        return best_practices
+
     def load_compliance_info(self) -> Dict[str, str]:
-        """
-        Load and parse the compliance_info CSV file.
-        
-        Returns:
-            A dictionary containing the compliance information
-        """
-        logger.log_data_access("CSVManager", self.rag3_path, "read", "Loading compliance info")
-        try:
-            df = pd.read_csv(self.rag3_path)
-            # Convert the DataFrame to a dictionary
-            compliance_info = {}
-            for _, row in df.iterrows():
-                if len(row) >= 2:  # Ensure there are at least two columns
-                    key = row[0]
-                    value = row[1]
-                    if pd.notna(key) and pd.notna(value):  # Skip NaN values
-                        compliance_info[key] = value
-            
-            logger.log_info(f"Successfully loaded compliance info with {len(compliance_info)} entries")
-            return compliance_info
-        except Exception as e:
-            logger.log_error(f"Error loading compliance info: {str(e)}")
-            return {}
+        df = pd.read_csv(self.rag3_path)
+        compliance_info = df.set_index(df.columns[0])[df.columns[1]].to_dict()
+        logger.log_data_access("CSVManager", self.rag3_path, "read", 
+                              f"Query: compliance_info search | Results: {len(compliance_info)} entries")
+        return compliance_info
     
     def load_all_rag_data(self) -> Dict[str, Dict[str, str]]:
         """

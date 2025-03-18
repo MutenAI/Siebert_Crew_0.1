@@ -19,20 +19,39 @@ class WebSearchTool(BaseTool):
         "Search the web for information using the Serper API."
     )
     args_schema: Type[BaseModel] = WebSearchToolInput
-    api_key: str = Field(default_factory=lambda: ConfigManager().get_api_key("serper"))
+    api_key: str = Field(default_factory=lambda: os.getenv("SERPER_API_KEY") or ConfigManager().get_api_key("serper"))
 
     def _run(self, query: str, num_results: int = 5) -> str:
+        # Input validation
+        if not query or not isinstance(query, str):
+            error_msg = "Invalid search query: must be a non-empty string"
+            logger.log_error(error_msg)
+            return error_msg
+            
+        if not isinstance(num_results, int) or not (1 <= num_results <= 100):
+            error_msg = f"Invalid num_results: {num_results}. Must be between 1-100"
+            logger.log_error(error_msg)
+            return error_msg
+
+        if not self.api_key:
+            error_msg = "Missing Serper API key - check configuration"
+            logger.log_error(error_msg)
+            return error_msg
+
         logger.log_agent_action("WebSearchTool", "search", f"Searching for '{query}' on the web")
         
         try:
             url = "https://google.serper.dev/search"
             payload = json.dumps({
                 "q": query,
-                "num": num_results
+                "num": num_results,
+                "page": 1,
+                "hl": "en"
             })
             headers = {
-                'X-API-Key': self.api_key,  # Corrected header key casing
-                'Content-Type': 'application/json'
+                'X-API-KEY': self.api_key,
+                'Content-Type': 'application/json',
+                'User-Agent': 'CrewAI/1.0 (Siebert_Content_Crew)'
             }
             
             @backoff.on_exception(backoff.expo,
@@ -48,28 +67,23 @@ class WebSearchTool(BaseTool):
             response = make_request()
             
             if response.status_code == 403:
-                error_msg = "Invalid API credentials - check ConfigManager settings"
+                error_msg = "Invalid or missing API credentials - verify ConfigManager settings"
                 logger.log_error(error_msg)
-                return error_msg
-            
+                return f"ERROR: {error_msg}. Please check your API configuration."
+
             if response.status_code != 200:
-                error_msg = f"Error searching the web: Status code {response.status_code}"
+                error_msg = f"API request failed: {response.status_code} - {response.text}"
                 logger.log_error(error_msg)
-                return error_msg
-            logger.log_api_call("Serper API", "search", "completed", f"Status code: {response.status_code}")
-            
-            if response.status_code != 200:
-                error_msg = f"Error searching the web: Status code {response.status_code}"
-                logger.log_error(error_msg)
-                return error_msg
-            
+                return f"ERROR: {error_msg}"
+
             search_results = response.json()
             
             # Format the results
-            result_str = f"Search results for '{query}':\n\n"
+            result_str = f"## Web Search Results for '{query}'\n\n"
             
             # Process organic results
             if "organic" in search_results:
+                result_str += "### Top Results:\n"
                 for i, result in enumerate(search_results["organic"], 1):
                     if i > num_results:
                         break
@@ -77,18 +91,25 @@ class WebSearchTool(BaseTool):
                     title = result.get("title", "No title")
                     link = result.get("link", "No link")
                     snippet = result.get("snippet", "No snippet")
+                    date = result.get("date", "Date not available")
+                    author = result.get("author", "Unknown author")
                     
-                    result_str += f"{i}. {title}\n"
-                    result_str += f"   URL: {link}\n"
-                    result_str += f"   Snippet: {snippet}\n\n"
+                    result_str += f"**{i}. {title}**\n"
+                    result_str += f"- 🔗 [Source]({link})\n"
+                    result_str += f"- 👤 {author}\n" if author else ""
+                    result_str += f"- 📅 {date}\n" if date else ""
+                    result_str += f"- 📝 {snippet}\n\n"
             
-            # Process knowledge graph if available
+            # Process knowledge graph
             if "knowledgeGraph" in search_results:
                 kg = search_results["knowledgeGraph"]
-                result_str += "Knowledge Graph:\n"
-                result_str += f"Title: {kg.get('title', 'N/A')}\n"
-                result_str += f"Type: {kg.get('type', 'N/A')}\n"
-                result_str += f"Description: {kg.get('description', 'N/A')}\n\n"
+                result_str += "\n### Knowledge Graph:\n"
+                result_str += f"**{kg.get('title', 'N/A')}**\n"
+                result_str += f"- Type: {kg.get('type', 'N/A')}\n"
+                result_str += f"- Description: {kg.get('description', 'N/A')}\n"
+                
+                for attr, value in kg.get('attributes', {}).items():
+                    result_str += f"- {attr.capitalize()}: {value}\n"
             
             logger.log_info(f"Found {min(num_results, len(search_results.get('organic', [])))} search results for '{query}'")
             return result_str

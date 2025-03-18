@@ -42,9 +42,9 @@ class CSVSearchTool(BaseTool):
             elif csv_file.lower() == 'compliance_info':
                 data = self.csv_manager.load_compliance_info()
             else:
-                warning_msg = f"Warning: Invalid CSV file '{csv_file}'. Defaulting to 'compliance_info'."
+                warning_msg = f"Warning: Invalid CSV file '{csv_file}'. Valid options are: brand_info, best_practices, compliance_info"
                 logger.log_warning(warning_msg)
-                data = self.csv_manager.load_compliance_info()
+                return warning_msg
             
             # Search for the query in the data
             

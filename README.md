@@ -1,54 +1,93 @@
-# CrewAutomationContentEditorLauncher Crew
+# Siebert Content Crew
 
-Welcome to the CrewAutomationContentEditorLauncher Crew project, powered by [crewAI](https://crewai.com). This template is designed to help you set up a multi-agent AI system with ease, leveraging the powerful and flexible framework provided by crewAI. Our goal is to enable your agents to collaborate effectively on complex tasks, maximizing their collective intelligence and capabilities.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![CrewAI Framework](https://img.shields.io/badge/Framework-CrewAI-blue)](https://www.crewai.com)
 
-## Installation
+## Introduzione
+Il Siebert Content Crew è un sistema avanzato di automazione per la creazione di contenuti basato sul framework CrewAI, integrato con un sistema RAG (Retrieval-Augmented Generation) per garantire coerenza con le linee guida aziendali e conformità legale.
 
-Ensure you have Python >=3.10 <=3.13 installed on your system. This project uses [UV](https://docs.astral.sh/uv/) for dependency management and package handling, offering a seamless setup and execution experience.
+## 🛠 Installazione
 
-First, if you haven't already, install uv:
-
-```bash
-pip install uv
-```
-
-Next, navigate to your project directory and install the dependencies:
-
-(Optional) Lock the dependencies and install them by using the CLI command:
-```bash
-crewai install
-```
-### Customizing
-
-**Add your `OPENAI_API_KEY` into the `.env` file**
-
-- Modify `src/crew_automation_content_editor_launcher/config/agents.yaml` to define your agents
-- Modify `src/crew_automation_content_editor_launcher/config/tasks.yaml` to define your tasks
-- Modify `src/crew_automation_content_editor_launcher/crew.py` to add your own logic, tools and specific args
-- Modify `src/crew_automation_content_editor_launcher/main.py` to add custom inputs for your agents and tasks
-
-## Running the Project
-
-To kickstart your crew of AI agents and begin task execution, run this from the root folder of your project:
+1. **Prerequisiti di sistema**
+   - Python 3.10 o superiore
+   - Git per il controllo versione
+   - Accesso all'API di OpenAI
 
 ```bash
-$ crewai run
+git clone https://github.com/MutenAI/Siebert_Crew.git
+cd Siebert_Crew
 ```
 
-This command initializes the crew_automation_content_editor_launcher Crew, assembling the agents and assigning them tasks as defined in your configuration.
+2. **Configurazione ambiente virtuale**
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
 
-This example, unmodified, will run the create a `report.md` file with the output of a research on LLMs in the root folder.
+3. **Configurazione chiavi API**
+Creare un file `.env` nella root del progetto con:
+```ini
+OPENAI_API_KEY="your-api-key-here"
+```
 
-## Understanding Your Crew
+## 🏗 Architettura del Sistema
 
-The crew_automation_content_editor_launcher Crew is composed of multiple AI agents, each with unique roles, goals, and tools. These agents collaborate on a series of tasks, defined in `config/tasks.yaml`, leveraging their collective skills to achieve complex objectives. The `config/agents.yaml` file outlines the capabilities and configurations of each agent in your crew.
+### Componenti principali
+1. **CrewAI**
+   - Orchestrazione degli agenti intelligenti
+   - Gestione del ciclo di vita dei task
+   - Comunicazione inter-agente
 
-## Support
+2. **Sistema RAG**
+   - **Rag 1/**: Metadati aziendali e informazioni di brand
+     - File: brand_info.csv
+     - Struttura: [Nome Brand, Sito Web, Descrizione, Target Audience, Tono di Voce]
+   - **Rag 2/**: Best practice per contenuti finanziari
+     - File: best_practices.csv
+     - Esempio: [Tipo Contenuto, Struttura Consigliata, Esempi]
+   - **Rag 3/**: Conformità legale e requisiti
+     - File: compliance_info.csv
+     - Campi obbligatori: [Settore Regolamentato, Disclaimer, Norme GDPR]
 
-For support, questions, or feedback regarding the CrewAutomationContentEditorLauncher Crew or crewAI.
-- Visit our [documentation](https://docs.crewai.com)
-- Reach out to us through our [GitHub repository](https://github.com/joaomdmoura/crewai)
-- [Join our Discord](https://discord.com/invite/X4JWnZnxPb)
-- [Chat with our docs](https://chatg.pt/DWjSBZn)
+## 🔄 Flusso di Lavoro
 
-Let's create wonders together with the power and simplicity of crewAI.
+1. **Inizializzazione Sistema**
+   ```mermaid
+   graph TD
+     A[Caricamento Configurazioni] --> B[Verifica File RAG]
+     B --> C[Connessione API Esterne]
+   ```
+
+2. **Orchestrazione Agenti**
+   - **Analista Contenuti**: Verifica requisiti tecnici
+   - **Copywriter AI**: Genera contenuti applicando:
+     - Template predefiniti
+     - Ottimizzazione SEO
+     - Adattamento tono di voce
+   - **Revisore Legale**: Controlla:
+     - Presenza disclaimer
+     - Conformità GDPR
+     - Restrizioni di settore
+
+3. **Generazione Output**
+   - Formati supportati:
+     - Markdown (per blog/post)
+     - PDF (documenti ufficiali)
+     - JSON (integrazioni API)
+
+## 🚀 Esecuzione
+
+```bash
+# Modalità sviluppo con hot-reload
+python3 src/crew_automation_content_editor_launcher/main.py --watch --rag-dir ./RAG
+
+# Modalità produzione
+python3 src/crew_automation_content_editor_launcher/main.py --production --log-level WARNING
+```
+
+
+
+---
+*Proprietà di Fylle SRL - Sviluppato per il cliente Siebert*
+

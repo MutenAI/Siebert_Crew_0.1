@@ -2,6 +2,7 @@ import os
 import json
 from typing import Dict, Any, Optional
 from .logger import logger
+from dotenv import load_dotenv
 
 class ConfigManager:
     """
@@ -10,14 +11,11 @@ class ConfigManager:
     """
     
     def __init__(self):
-        """
-        Initialize the Configuration Manager with default settings.
-        """
-        # Default API keys (will be overridden by environment variables if available)
+        load_dotenv()
         self.api_keys = {
-            "serper": os.getenv("SERPER_API_KEY", ""),
-            "anthropic": os.getenv("ANTHROPIC_API_KEY", ""),
-            "openai": os.getenv("OPENAI_API_KEY", "")
+            'serper': os.getenv('SERPER_API_KEY'),
+            'anthropic': os.getenv('ANTHROPIC_API_KEY'),
+            'openai': os.getenv('OPENAI_API_KEY')
         }
         
         # Default model settings for each agent
@@ -34,10 +32,15 @@ class ConfigManager:
         logger.log_info("Config Manager initialized with default settings")
     
     def _set_environment_variables(self):
-        """
-        Set environment variables for API keys if not already set.
-        """
-        # Only set environment variables if they don't already exist
+        load_dotenv()  # Reload environment variables
+        # Update API keys from refreshed environment
+        self.api_keys = {
+            'serper': os.getenv('SERPER_API_KEY'),
+            'anthropic': os.getenv('ANTHROPIC_API_KEY'),
+            'openai': os.getenv('OPENAI_API_KEY')
+        }
+        
+        # Set only if not already present in environment
         if not os.getenv("SERPER_API_KEY") and self.api_keys["serper"]:
             os.environ["SERPER_API_KEY"] = self.api_keys["serper"]
         
